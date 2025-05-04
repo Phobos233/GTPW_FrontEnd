@@ -47,7 +47,19 @@ const router = createRouter({
         {
             path: "/chart",
             name: "Chart",
-            component: () => import("../views/DepChart.vue"),
+            component: () => import("../views/ChartView.vue"),
+            children: [
+                {
+                    path: "RelationChart",
+                    name: "RelationMap",
+                    component: () => import("../views/DepChart.vue"),
+                },
+                {
+                    path: "MapChart",
+                    name: "RegionMap",
+                    component: () => import("../views/MapChart.vue"),
+                },
+            ]
         },
         {
             path: "/test",

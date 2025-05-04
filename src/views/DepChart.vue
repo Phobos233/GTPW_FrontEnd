@@ -1,42 +1,51 @@
 <template>
-    <v-chart id="depChart" :option="option" autoresize @click="detail" />
-    <el-drawer
-    v-model="drawer"
-    title="植物详细信息"
-    direction="rtl">
-    <div class="plantInfo">
-        <el-text>植物名称：{{ rawData[0].taxon }}</el-text>
-        <br/>
-        <el-text>植物分类：{{ rawData[0].family }}</el-text>
-        <br/>
-        <el-text>发现地区：{{ rawData[0].region }}</el-text>
-        <br/>
-        <el-text>所属国家：{{ rawData[0].country }}</el-text>
-        <br/>
-        <el-text>图片：</el-text>
-    </div>
+    <v-chart id="depChart" :option="mapOption" autoresize @click="detail" />
+    <el-drawer v-model="drawer" title="植物详细信息" direction="rtl">
+        <div class="plantInfo">
+            <el-text>植物名称：{{ rawData[0].taxon }}</el-text>
+            <br />
+            <el-text>植物分类：{{ rawData[0].family }}</el-text>
+            <br />
+            <el-text>发现地区：{{ rawData[0].region }}</el-text>
+            <br />
+            <el-text>所属国家：{{ rawData[0].country }}</el-text>
+            <br />
+            <el-text>
+                图片： </el-text>
+            <el-image src="src/res/img/sample.png" fit="contain" style="height: 50%;width: 50%;" />
+
+
+        </div>
 
     </el-drawer>
 </template>
 <script setup lang="ts">
+
 import axios from 'axios';
 import { onMounted, provide, ref, toRaw, toRef, toRefs } from 'vue';
 import VChart, { THEME_KEY } from 'vue-echarts';
 import { use } from 'echarts/core';
+import GT from "@/res/json/MapJson.json";
 import {
     TitleComponent
     , TooltipComponent
-    , LegendComponent
+    , LegendComponent,
+    GeoComponent,
+    VisualMapComponent
 } from 'echarts/components';
-import { GraphChart } from 'echarts/charts';
+import { GraphChart, MapChart } from 'echarts/charts';
 import { CanvasRenderer } from 'echarts/renderers';
-import { id } from 'element-plus/es/locales.mjs';
+import * as echarts from 'echarts/core';
 
 use([TitleComponent
     , GraphChart
     , CanvasRenderer
     , TooltipComponent
-    , LegendComponent]);
+    , LegendComponent
+    , GeoComponent
+    , MapChart
+    , VisualMapComponent
+]);
 
 // provide(THEME_KEY, 'dark');
 
@@ -53,7 +62,8 @@ interface rawEdge {
     target: string;
     type: string;
 }
-const drawer = ref(false)
+
+
 
 let data = ref([])
 let linkdata = ref([])
@@ -65,24 +75,18 @@ let rawData = ref([{
     family: '',
     country: ''
 }])
-
-const option = ref(
+const drawer = ref(false)
+const mapData: any = GT
+const depOption = ref(
     {
         title: {
             text: '植物分类点状图',
             left: 'center',
-            top: '10px',
+            top: '20px',
         },
         tooltip: {
             trigger: 'item', // 触发类型
             formatter: '{b} <br/> {c}', // 标签格式
-        },
-        label: {
-            show: true, // 显示标签
-            position: 'left', // 标签位置
-            formatter: '{b}', // 标签格式
-            fontSize: 12, // 字体大小
-            color: '#fff' // 字体颜色
         },
 
         series: [
@@ -93,16 +97,22 @@ const option = ref(
                 type: 'graph',
                 roam: true, // 允许拖拽缩放
                 layout: "force",
-                SymbolSize: 50, // 节点大小
-                Symbol: 'circle', // 节点形状
+                symbolSize: 50, // 节点大小
+                symbol: 'circle', // 节点形状
                 force: {
-                    repulsion: 100, // 节点间斥力
-                    gravity: 1,    // 向心力
-                    edgeLength: 50 // 边的理想长度
+                    repulsion: 1500, // 节点间斥力
+                    gravity: 0.5,    // 向心力
+                    edgeLength: 200 // 边的理想长度
                 },
                 data: data, // 节点数据
                 links: linkdata,
-
+                label: {
+                    show: true, // 显示标签
+                    position: 'left', // 标签位置
+                    formatter: '{b}', // 标签格式
+                    fontSize: 12, // 字体大小
+                    color: '#000000' // 字体颜色
+                },
                 emphasis: {
                     focus: 'adjacency',
                     lineStyle: {
@@ -113,6 +123,67 @@ const option = ref(
         ]
     }
 )
+const mapOption = ref(
+    {
+        title: {
+            text: '金三角地区植物分布图',
+            left: 'center',
+            top: '20px',
+        },
+        tooltip: {
+            trigger: 'item',
+            formatter: '{b} <br/> {c}'
+        },
+        series: [
+            {
+                name: '金三角地区植物分布图',
+                type: 'map',
+                map: 'GT',
+                roam: true,
+                zoom: 1.2,
+                label: {
+                    show: true,
+                    fontSize: 12,
+                    color: '#000000'
+                },
+                itemStyle: {
+                    areaColor: '#f0f0f0',
+                    borderColor: '#999999',
+                    borderWidth: 1
+                },
+                emphasis: {
+                    itemStyle: {
+                        areaColor: '#ffcc00'
+                    }
+                },
+                data: [
+                    { name: '克钦邦', value: 3829 },
+                    { name: '掸邦', value: 3829 },
+                    { name: '琅南塔', value: 846 },
+                    { name: '琅勃拉邦', value: 846 },
+                    { name: '乌多姆赛', value: 846 },
+                    { name: '丰沙里', value: 846 },
+                    { name: '波乔', value: 846 },
+                    { name: '清莱', value: 4817 },
+                    { name: '清迈', value: 4817 }
+                ], // 这里可以添加地图数据
+                nameMap: {
+                    "Kachin": '克钦邦'
+                    , "Shan": '掸邦'
+                    , "Louangnamtha": '琅南塔'
+                    , "Louangphabang": '琅勃拉邦'
+                    , "Oudomxai": '乌多姆赛'
+                    , "Phongsaly": '丰沙里'
+                    , "Bokeo": '波乔'
+                    , "Chiang Rai": '清莱'
+                    , "Chiang Mai": '清迈'
+                },
+            }
+        ]
+
+    }
+)
+const chartOptionRef = ref()
 
 function SearchAllNodes() {
     axios({
@@ -131,6 +202,7 @@ function SearchAllNodes() {
         });
     return data.value
 }
+
 function SearchAllEdges() {
     axios({
         method: 'post',
@@ -149,6 +221,7 @@ function SearchAllEdges() {
         });
     return linkdata.value
 }
+
 function SearchRawData(id: number) {
     axios({
         method: 'post',
@@ -173,22 +246,30 @@ function detail(params: any) {
     console.log(params.data.id)
     drawer.value = true
     SearchRawData(params.data.id)
-
     console.log(rawData.value)
 }
 
+function mapInit() {
+    echarts.registerMap('GT', mapData)
+}
+function ChartSwitch() {
+    if (chartOptionRef.value === mapOption.value) {
+        chartOptionRef.value = depOption.value
+    } else {
+        chartOptionRef.value = mapOption.value
+    }
+}
+
 onMounted(() => {
+    mapInit()
     SearchAllNodes()
     SearchAllEdges()
 })
 
 
-
-
 </script>
 <style lang="css" scoped>
 #depChart {
-
     height: 100vh;
 }
 </style>

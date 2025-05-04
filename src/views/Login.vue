@@ -2,6 +2,7 @@
     <div class="loginLayout">
         <el-row>
             <el-col :span="12" :xs="0"></el-col>
+            
             <el-col :span="12" :xs="24" justify="center" align="middle">
                 <el-form class="loginForm">
                     <h1>登录</h1>
@@ -14,7 +15,8 @@
                             class="input" placeholder="密码" show-password></el-input>
                     </el-form-item>
                     <el-form-item>
-                        <el-button class="btnLogin" type="primary" size="default" @click="login">登录</el-button>
+                        <el-button class="btnLogin" 
+                        type="primary" size="default" @click="login">登录</el-button>
                     </el-form-item>
 
                 </el-form>

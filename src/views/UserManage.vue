@@ -40,7 +40,9 @@ function SearchAll() {
         });
     return data
 }
+
 </script>
+
 <style lang="">
     
 </style>

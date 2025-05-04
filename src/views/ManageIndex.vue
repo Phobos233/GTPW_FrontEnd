@@ -3,7 +3,8 @@
     <el-container height=100vh>
       <el-header id="nav" height="8vh">
         <el-row justify="space-between" height="100vh" align="middle">
-          <el-col :span="8">
+          <el-col :span="8" style="">
+            <!-- <el-icon icon="../res/img/leaf.png"></el-icon> -->
             <h2>管理系统首页</h2>
           </el-col>
 

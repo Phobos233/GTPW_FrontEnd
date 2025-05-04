@@ -8,6 +8,7 @@
             <el-table-column prop="region" label="发现地区"></el-table-column>
             <el-table-column prop="country" label="所属国家"></el-table-column>
             <el-table-column prop="imgURL" label="图片">图片</el-table-column>
+            <el-table-column prop="label" label="类型"></el-table-column>
             <el-table-column label="操作">
                 <el-button type="primary" @click="Edit">编辑</el-button>
                 <el-button type="danger">删除</el-button>
