@@ -41,14 +41,27 @@ const router = createRouter({
             component: () => import("../views/Login.vue"),  
         },
         {
+            path: "/chart",
+            name: "Chart",
+            component: () => import("../views/ChartView.vue"),
+            children: [
+                {
+                    path: "RelationChart",
+                    name: "RelationMap",
+                    component: () => import("../views/DepChart.vue"),
+                },
+                {
+                    path: "MapChart",
+                    name: "RegionMap",
+                    component: () => import("../views/MapChart.vue"),
+                },
+            ]
+        },
+        {
             path: "/",
             redirect: "/index",
         },
-        {
-            path: "/chart",
-            name: "Chart",
-            component: () => import("../views/DepChart.vue"),
-        },
+
         {
             path: "/test",
             name: "Test",
