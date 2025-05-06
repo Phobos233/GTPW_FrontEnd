@@ -1,5 +1,5 @@
 <template>
-    <v-chart id="depChart" :option="mapOption" autoresize @click="detail" />
+    <v-chart id="depChart" :option="depOption" autoresize @click="detail" />
     <el-drawer v-model="drawer" title="植物详细信息" direction="rtl">
         <div class="plantInfo">
             <el-text>植物名称：{{ rawData[0].taxon }}</el-text>
@@ -25,15 +25,13 @@ import axios from 'axios';
 import { onMounted, provide, ref, toRaw, toRef, toRefs } from 'vue';
 import VChart, { THEME_KEY } from 'vue-echarts';
 import { use } from 'echarts/core';
-import GT from "@/res/json/MapJson.json";
 import {
     TitleComponent
     , TooltipComponent
     , LegendComponent,
-    GeoComponent,
     VisualMapComponent
 } from 'echarts/components';
-import { GraphChart, MapChart } from 'echarts/charts';
+import { GraphChart } from 'echarts/charts';
 import { CanvasRenderer } from 'echarts/renderers';
 import * as echarts from 'echarts/core';
 
@@ -42,28 +40,10 @@ use([TitleComponent
     , CanvasRenderer
     , TooltipComponent
     , LegendComponent
-    , GeoComponent
-    , MapChart
     , VisualMapComponent
 ]);
 
 // provide(THEME_KEY, 'dark');
-
-interface rawNode {
-    id: number;
-    label: Array<string>;
-    taxon: string;
-    region: string;
-    family: string;
-    country: string;
-}
-interface rawEdge {
-    source: string;
-    target: string;
-    type: string;
-}
-
-
 
 let data = ref([])
 let linkdata = ref([])
@@ -76,7 +56,7 @@ let rawData = ref([{
     country: ''
 }])
 const drawer = ref(false)
-const mapData: any = GT
+
 const depOption = ref(
     {
         title: {
@@ -123,67 +103,6 @@ const depOption = ref(
         ]
     }
 )
-const mapOption = ref(
-    {
-        title: {
-            text: '金三角地区植物分布图',
-            left: 'center',
-            top: '20px',
-        },
-        tooltip: {
-            trigger: 'item',
-            formatter: '{b} <br/> {c}'
-        },
-        series: [
-            {
-                name: '金三角地区植物分布图',
-                type: 'map',
-                map: 'GT',
-                roam: true,
-                zoom: 1.2,
-                label: {
-                    show: true,
-                    fontSize: 12,
-                    color: '#000000'
-                },
-                itemStyle: {
-                    areaColor: '#f0f0f0',
-                    borderColor: '#999999',
-                    borderWidth: 1
-                },
-                emphasis: {
-                    itemStyle: {
-                        areaColor: '#ffcc00'
-                    }
-                },
-                data: [
-                    { name: '克钦邦', value: 3829 },
-                    { name: '掸邦', value: 3829 },
-                    { name: '琅南塔', value: 846 },
-                    { name: '琅勃拉邦', value: 846 },
-                    { name: '乌多姆赛', value: 846 },
-                    { name: '丰沙里', value: 846 },
-                    { name: '波乔', value: 846 },
-                    { name: '清莱', value: 4817 },
-                    { name: '清迈', value: 4817 }
-                ], // 这里可以添加地图数据
-                nameMap: {
-                    "Kachin": '克钦邦'
-                    , "Shan": '掸邦'
-                    , "Louangnamtha": '琅南塔'
-                    , "Louangphabang": '琅勃拉邦'
-                    , "Oudomxai": '乌多姆赛'
-                    , "Phongsaly": '丰沙里'
-                    , "Bokeo": '波乔'
-                    , "Chiang Rai": '清莱'
-                    , "Chiang Mai": '清迈'
-                },
-            }
-        ]
-
-    }
-)
-const chartOptionRef = ref()
 
 function SearchAllNodes() {
     axios({
@@ -249,23 +168,10 @@ function detail(params: any) {
     console.log(rawData.value)
 }
 
-function mapInit() {
-    echarts.registerMap('GT', mapData)
-}
-function ChartSwitch() {
-    if (chartOptionRef.value === mapOption.value) {
-        chartOptionRef.value = depOption.value
-    } else {
-        chartOptionRef.value = mapOption.value
-    }
-}
-
 onMounted(() => {
-    mapInit()
     SearchAllNodes()
     SearchAllEdges()
 })
-
 
 </script>
 <style lang="css" scoped>

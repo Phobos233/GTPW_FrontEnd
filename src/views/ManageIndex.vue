@@ -1,4 +1,4 @@
-<template>
+<template lang="html">
   <div class="common-layout">
     <el-container height=100vh>
       <el-header id="nav" height="8vh">
@@ -14,7 +14,10 @@
 
           <el-col :span="8" align="end">
             <el-button type="primary" :icon="el - icon - s - tools">设置</el-button>
-            <el-button type="danger" :icon="el - icon - s - tools">退出</el-button>
+            <el-button type="danger" 
+            :icon="el - icon - s - tools"
+            @click="logout">
+            退出</el-button>
           </el-col>
         </el-row>
 
@@ -68,6 +71,12 @@
 
 <script setup>
 import { RouterView } from 'vue-router';
+import { useRouter } from 'vue-router';
+const router = useRouter()
+function logout() {
+  localStorage.removeItem('token');
+  router.push('/index');
+}
 </script>
 
 <style scoped>

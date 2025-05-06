@@ -41,10 +41,6 @@ const router = createRouter({
             component: () => import("../views/Login.vue"),  
         },
         {
-            path: "/",
-            redirect: "/index",
-        },
-        {
             path: "/chart",
             name: "Chart",
             component: () => import("../views/ChartView.vue"),
@@ -61,6 +57,11 @@ const router = createRouter({
                 },
             ]
         },
+        {
+            path: "/",
+            redirect: "/index",
+        },
+
         {
             path: "/test",
             name: "Test",

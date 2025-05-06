@@ -2,9 +2,16 @@
     <div class="loginLayout">
         <el-row>
             <el-col :span="12" :xs="0"></el-col>
-            
+
             <el-col :span="12" :xs="24" justify="center" align="middle">
                 <el-form class="loginForm">
+                    <el-row id="btnBack" align="start" justify="start">
+                        <router-link to="/index">
+                            <el-icon>
+                                <ArrowLeft />
+                            </el-icon>
+                        </router-link>
+                    </el-row>
                     <h1>登录</h1>
                     <el-form-item prop="username">
                         <el-input prefix-icon="User" type="text" v-model="loginFormInfo.username" size="large"
@@ -15,8 +22,7 @@
                             class="input" placeholder="密码" show-password></el-input>
                     </el-form-item>
                     <el-form-item>
-                        <el-button class="btnLogin" 
-                        type="primary" size="default" @click="login">登录</el-button>
+                        <el-button class="btnLogin" type="primary" size="default" @click="login">登录</el-button>
                     </el-form-item>
 
                 </el-form>
@@ -26,32 +32,36 @@
 
 </template>
 <script lang="ts" setup>
-import { reactive,toRaw } from 'vue';
+import { reactive, toRaw } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 
-
+const router = useRouter()
 let loginFormInfo = reactive({
     username: '',
     password: ''
 })
 console.log(loginFormInfo);
 
+function logintest() {
+    router.push('/manage/home');
+}
+
 function login() {
-    axios.post('http://localhost:8080/login',loginFormInfo ).then((res) => {
+    axios.post('http://localhost:8080/login', loginFormInfo).then((res) => {
         if (res.data.code !== 1) {
             console.log(res.data.msg);
             return;
-        }else{
+        } else {
             console.log(res.data.data.token);
             localStorage.setItem('token', res.data.data.token);
-            useRouter().push('/manage/home');
+            router.push('/manage/home');
         }
-        
+
     }).catch((err) => {
         console.log(err);
     })
-    
+
 }
 
 
@@ -113,5 +123,14 @@ function login() {
     font-size: 20px;
     font-weight: bold;
     box-shadow: 5px 5px 5px #3a3a3ab6;
+}
+
+#btnBack {
+    position: absolute;
+    top: 5%;
+    left: 5%;
+    font-size: 20px;
+    color: #ffffff;
+    cursor: pointer;
 }
 </style>
