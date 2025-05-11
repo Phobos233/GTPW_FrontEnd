@@ -3,7 +3,7 @@
 
         <el-container>
 
-            <el-header id="nav" height="10vh">
+            <el-header id="nav" height="10%">
 
                 <el-row justify="start" align="middle">
 
@@ -33,7 +33,7 @@
 
             </el-header>
 
-            <el-main id="MainChartView" height="80vh">
+            <el-main id="MainChartView" height="90vh">
 
                 <RouterView></RouterView>
             </el-main>
@@ -56,4 +56,5 @@ import { RouterView } from 'vue-router';
     color: #000000;
     align-items: center;
 }
+
 </style>

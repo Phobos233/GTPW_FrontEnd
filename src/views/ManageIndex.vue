@@ -14,10 +14,8 @@
 
           <el-col :span="8" align="end">
             <el-button type="primary" :icon="el - icon - s - tools">设置</el-button>
-            <el-button type="danger" 
-            :icon="el - icon - s - tools"
-            @click="logout">
-            退出</el-button>
+            <el-button type="danger" :icon="el - icon - s - tools" @click="logout">
+              退出</el-button>
           </el-col>
         </el-row>
 
@@ -27,16 +25,19 @@
 
           <el-menu router>
             <el-menu-item index="/manage/home">
-                主页
+              主页
             </el-menu-item>
-            <el-menu-item index="/manage/plantNode">
-                植物节点管理
+            <el-menu-item index="/manage/SpeciesNode">
+              植物物种节点管理
+            </el-menu-item>
+            <el-menu-item index="/manage/GenusNode">
+              植物属节点管理
             </el-menu-item>
             <el-menu-item index="/manage/plantRelation">
-                植物关系管理
+              植物分类关系管理
             </el-menu-item>
             <el-menu-item index="/manage/user">
-                用户管理
+              用户管理
             </el-menu-item>
 
           </el-menu>

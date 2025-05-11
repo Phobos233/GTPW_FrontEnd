@@ -1,6 +1,6 @@
 <template lang="html">
-    <div>
-        <v-chart :option="mapOption" style="width: 100%; height: 100vh;"></v-chart>
+    <div class="ChartLayout">
+        <v-chart :option="mapOption" autoresize style="width: 100%; height: 100%;"></v-chart>
     </div>
 </template>
 <script lang="ts" setup>
@@ -69,15 +69,15 @@ const mapOption = ref(
                     }
                 },
                 data: [
-                    { name: '克钦邦', value: 3829 },
-                    { name: '掸邦', value: 3829 },
-                    { name: '琅南塔', value: 846 },
-                    { name: '琅勃拉邦', value: 846 },
-                    { name: '乌多姆赛', value: 846 },
-                    { name: '丰沙里', value: 846 },
-                    { name: '波乔', value: 846 },
-                    { name: '清莱', value: 4817 },
-                    { name: '清迈', value: 4817 }
+                    { name: '克钦邦', value: 10110 },
+                    { name: '掸邦', value: 10110 },
+                    { name: '琅南塔', value: 5449 },
+                    { name: '琅勃拉邦', value: 5449 },
+                    { name: '乌多姆赛', value: 5449 },
+                    { name: '丰沙里', value: 5449 },
+                    { name: '波乔', value: 5449 },
+                    { name: '清莱', value: 11636 },
+                    { name: '清迈', value: 11636 }
                 ], // 这里可以添加地图数据
                 nameMap: {
                     "Kachin": '克钦邦'
@@ -97,7 +97,15 @@ const mapOption = ref(
 )
 
 
+
 </script>
-<style lang="">
-    
+<style lang="css">
+    .ChartLayout {
+        width: 100%;
+        height: 100%;
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+    }
 </style>

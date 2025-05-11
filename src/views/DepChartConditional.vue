@@ -144,7 +144,7 @@ function SearchAllEdges() {
 function SearchRawData(id: number) {
     axios({
         method: 'post',
-        url: 'http://localhost:8080/findSpeciesById', // Replace with your actual API endpoint
+        url: 'http://localhost:8080/findById', // Replace with your actual API endpoint
         params: {
             id: id // Use the search query from the input field
         }
@@ -162,9 +162,9 @@ function SearchRawData(id: number) {
 }
 
 function detail(params: any) {
-    console.log(params.data.node_id)
+    console.log(params.data.id)
     drawer.value = true
-    SearchRawData(params.data.node_id)
+    SearchRawData(params.data.id)
     console.log(rawData.value)
 }
 

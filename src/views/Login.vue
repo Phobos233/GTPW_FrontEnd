@@ -2,7 +2,6 @@
     <div class="loginLayout">
         <el-row>
             <el-col :span="12" :xs="0"></el-col>
-
             <el-col :span="12" :xs="24" justify="center" align="middle">
                 <el-form class="loginForm">
                     <el-row id="btnBack" align="start" justify="start">
