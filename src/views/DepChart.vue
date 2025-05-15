@@ -1,24 +1,26 @@
 <template>
-    <v-chart id="depChart" :option="option" autoresize @click="detail" />
-    <el-drawer
-    v-model="drawer"
-    title="植物详细信息"
-    direction="rtl">
-    <div class="plantInfo">
-        <el-text>植物名称：{{ rawData[0].taxon }}</el-text>
-        <br/>
-        <el-text>植物分类：{{ rawData[0].family }}</el-text>
-        <br/>
-        <el-text>发现地区：{{ rawData[0].region }}</el-text>
-        <br/>
-        <el-text>所属国家：{{ rawData[0].country }}</el-text>
-        <br/>
-        <el-text>图片：</el-text>
-    </div>
+    <v-chart id="depChart" :option="depOption" autoresize @click="detail" />
+    <el-drawer v-model="drawer" title="植物详细信息" direction="rtl">
+        <div class="plantInfo">
+            <el-text>植物名称：{{ rawData[0].ch_name }}</el-text>
+            <br />
+            <el-text>植物分类（科）：{{ rawData[0].family }}</el-text>
+            <br />
+            <el-text>植物学名：{{ rawData[0].taxon_name }}</el-text>
+            <br />
+            <el-text>所属国家：{{ rawData[0].country }}</el-text>
+            <br />
+            <el-text>
+                图片： </el-text>
+            <el-image src="src/res/img/sample.png" fit="contain" style="height: 50%;width: 50%;" />
+
+
+        </div>
 
     </el-drawer>
 </template>
 <script setup lang="ts">
+
 import axios from 'axios';
 import { onMounted, provide, ref, toRaw, toRef, toRefs } from 'vue';
 import VChart, { THEME_KEY } from 'vue-echarts';
@@ -26,63 +28,45 @@ import { use } from 'echarts/core';
 import {
     TitleComponent
     , TooltipComponent
-    , LegendComponent
+    , LegendComponent,
+    VisualMapComponent
 } from 'echarts/components';
 import { GraphChart } from 'echarts/charts';
 import { CanvasRenderer } from 'echarts/renderers';
-import { id } from 'element-plus/es/locales.mjs';
+import * as echarts from 'echarts/core';
 
 use([TitleComponent
     , GraphChart
     , CanvasRenderer
     , TooltipComponent
-    , LegendComponent]);
+    , LegendComponent
+    , VisualMapComponent
+]);
 
 // provide(THEME_KEY, 'dark');
-
-interface rawNode {
-    id: number;
-    label: Array<string>;
-    taxon: string;
-    region: string;
-    family: string;
-    country: string;
-}
-interface rawEdge {
-    source: string;
-    target: string;
-    type: string;
-}
-const drawer = ref(false)
 
 let data = ref([])
 let linkdata = ref([])
 let rawData = ref([{
     id: Number,
-    label: [],
-    taxon: '',
-    region: '',
+    taxon_rank: '',
+    taxon_name: '',
+    ch_name: '',
     family: '',
     country: ''
 }])
+const drawer = ref(false)
 
-const option = ref(
+const depOption = ref(
     {
         title: {
             text: '植物分类点状图',
             left: 'center',
-            top: '10px',
+            top: '20px',
         },
         tooltip: {
             trigger: 'item', // 触发类型
             formatter: '{b} <br/> {c}', // 标签格式
-        },
-        label: {
-            show: true, // 显示标签
-            position: 'left', // 标签位置
-            formatter: '{b}', // 标签格式
-            fontSize: 12, // 字体大小
-            color: '#fff' // 字体颜色
         },
 
         series: [
@@ -93,16 +77,22 @@ const option = ref(
                 type: 'graph',
                 roam: true, // 允许拖拽缩放
                 layout: "force",
-                SymbolSize: 50, // 节点大小
-                Symbol: 'circle', // 节点形状
+                symbolSize: 50, // 节点大小
+                symbol: 'circle', // 节点形状
                 force: {
-                    repulsion: 100, // 节点间斥力
-                    gravity: 1,    // 向心力
-                    edgeLength: 50 // 边的理想长度
+                    repulsion: 1500, // 节点间斥力
+                    gravity: 0.5,    // 向心力
+                    edgeLength: 200 // 边的理想长度
                 },
                 data: data, // 节点数据
                 links: linkdata,
-
+                label: {
+                    show: true, // 显示标签
+                    position: 'left', // 标签位置
+                    formatter: '{b}', // 标签格式
+                    fontSize: 12, // 字体大小
+                    color: '#000000' // 字体颜色
+                },
                 emphasis: {
                     focus: 'adjacency',
                     lineStyle: {
@@ -117,7 +107,7 @@ const option = ref(
 function SearchAllNodes() {
     axios({
         method: 'post',
-        url: 'http://localhost:8080/Chart', // Replace with your actual API endpoint
+        url: 'http://localhost:8080/GraphChart_All', // Replace with your actual API endpoint
         // params: {
         //     search: this.searchQuery // Use the search query from the input field
         // }
@@ -131,6 +121,7 @@ function SearchAllNodes() {
         });
     return data.value
 }
+
 function SearchAllEdges() {
     axios({
         method: 'post',
@@ -149,12 +140,13 @@ function SearchAllEdges() {
         });
     return linkdata.value
 }
-function SearchRawData(id: number) {
+
+function SearchRawData(node_id: number) {
     axios({
         method: 'post',
-        url: 'http://localhost:8080/findById', // Replace with your actual API endpoint
+        url: 'http://localhost:8080/findSpeciesById', // Replace with your actual API endpoint
         params: {
-            id: id // Use the search query from the input field
+            id: node_id // Use the search query from the input field
         }
 
     })
@@ -170,10 +162,9 @@ function SearchRawData(id: number) {
 }
 
 function detail(params: any) {
-    console.log(params.data.id)
+    console.log(params.data.node_id)
     drawer.value = true
-    SearchRawData(params.data.id)
-
+    SearchRawData(params.data.node_id)
     console.log(rawData.value)
 }
 
@@ -182,13 +173,9 @@ onMounted(() => {
     SearchAllEdges()
 })
 
-
-
-
 </script>
 <style lang="css" scoped>
 #depChart {
-
     height: 100vh;
 }
 </style>

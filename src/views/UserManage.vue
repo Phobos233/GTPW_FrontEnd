@@ -36,11 +36,16 @@ function SearchAll() {
             console.log(response.data);
         })
         .catch(error => {
-            console.log('Error fetching plant data:', error);
+            console.log('Error fetching user data:', error);
         });
     return data
 }
+onMounted(() => {
+    SearchAll()
+})
+
 </script>
+
 <style lang="">
     
 </style>

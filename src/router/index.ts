@@ -1,5 +1,6 @@
 import { createRouter } from "vue-router";
 import { createWebHistory } from "vue-router";
+import MapChart from "../views/MapChart.vue";
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
@@ -14,9 +15,14 @@ const router = createRouter({
                     component: () => import("../views/Home.vue"),
                 },
                 {
-                    path: "plantNode",
-                    name: "PlantModeManage",
-                    component: () => import("../views/PlantNodeManage.vue"),
+                    path: "SpeciesNode",
+                    name: "SpeciesNodeManage",
+                    component: () => import("../views/SpeciesNodeManage.vue"),
+                },
+                {
+                    path: "GenusNode",
+                    name: "GenusNodeManage",
+                    component: () => import("../views/GenusNodeManage.vue"),
                 },
                 {
                     path:"plantRelation",
@@ -41,19 +47,31 @@ const router = createRouter({
             component: () => import("../views/Login.vue"),  
         },
         {
+            path: "/chart",
+            name: "Chart",
+            component: () => import("../views/ChartView.vue"),
+            children: [
+                {
+                    path: "RelationChart",
+                    name: "RelationMap",
+                    component: () => import("../views/DepChart.vue"),
+                },
+                {
+                    path: "MapChart",
+                    name: "RegionMap",
+                    component: () => import("../views/MapChart.vue"),
+                },
+            ]
+        },
+        {
             path: "/",
             redirect: "/index",
         },
         {
-            path: "/chart",
-            name: "Chart",
-            component: () => import("../views/DepChart.vue"),
+            path: "/chartsindex",
+            name: "ChartsIndex",
+            component: () => import("../views/ChartIndex.vue"),
         },
-        {
-            path: "/test",
-            name: "Test",
-            component: () => import("../views/testchart.vue"),
-        }
     ],
 })
 export default router
