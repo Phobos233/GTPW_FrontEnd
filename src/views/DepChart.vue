@@ -141,12 +141,12 @@ function SearchAllEdges() {
     return linkdata.value
 }
 
-function SearchRawData(id: number) {
+function SearchRawData(node_id: number) {
     axios({
         method: 'post',
         url: 'http://localhost:8080/findSpeciesById', // Replace with your actual API endpoint
         params: {
-            id: id // Use the search query from the input field
+            id: node_id // Use the search query from the input field
         }
 
     })

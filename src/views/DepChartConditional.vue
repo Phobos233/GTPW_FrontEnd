@@ -104,10 +104,10 @@ const depOption = ref(
     }
 )
 
-function SearchAllNodes() {
+function SearchNeedNodes() {
     axios({
         method: 'post',
-        url: 'http://localhost:8080/GraphChart_All', // Replace with your actual API endpoint
+        url: 'http://localhost:8080/getSpeciesInNeedForCharts', // Replace with your actual API endpoint
         // params: {
         //     search: this.searchQuery // Use the search query from the input field
         // }
@@ -115,6 +115,7 @@ function SearchAllNodes() {
     })
         .then(response => {
             data.value = response.data;
+            console.log(data.value)
         })
         .catch(error => {
             console.log('Error fetching plant data:', error);
@@ -125,7 +126,7 @@ function SearchAllNodes() {
 function SearchAllEdges() {
     axios({
         method: 'post',
-        url: 'http://localhost:8080/getEdgesForCharts', // Replace with your actual API endpoint
+        url: 'http://localhost:8080/getEdgesInNeedForCharts', // Replace with your actual API endpoint
         // params: {
         //     search: this.searchQuery // Use the search query from the input field
         // }
@@ -136,7 +137,7 @@ function SearchAllEdges() {
             console.log(linkdata.value)
         })
         .catch(error => {
-            console.log('Error fetching plant data:', error);
+            console.log('Error fetching edge data:', error);
         });
     return linkdata.value
 }
@@ -144,7 +145,7 @@ function SearchAllEdges() {
 function SearchRawData(id: number) {
     axios({
         method: 'post',
-        url: 'http://localhost:8080/findById', // Replace with your actual API endpoint
+        url: 'http://localhost:8080/findSpeciesById', // Replace with your actual API endpoint
         params: {
             id: id // Use the search query from the input field
         }
@@ -169,7 +170,7 @@ function detail(params: any) {
 }
 
 onMounted(() => {
-    SearchAllNodes()
+    SearchNeedNodes()
     SearchAllEdges()
 })
 

@@ -42,10 +42,10 @@
             </el-col>
             <el-col :span="8" justify="center" align="middle">
                 <div id="rightupper">
-                    <MapChart />
+                    <AreaChart />
                 </div>
                 <div id="rightlower">
-                    <MapChart />
+                    <DepChartConditional />
                 </div>
             </el-col>
         </el-row>
@@ -60,6 +60,8 @@ import MapChart from './MapChart.vue';
 import DepChart from './DepChart.vue';
 import BarChart_Country_Species from './BarChart_Country_Species.vue';
 import PieChart_Genus_Species from './PieChart_Genus_Species.vue';
+import AreaChart from './AreaChart.vue';
+import DepChartConditional from './DepChartConditional.vue';
 
 </script>
 <style lang="css" scoped>
