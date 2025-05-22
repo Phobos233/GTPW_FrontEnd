@@ -1,6 +1,6 @@
 <template lang="html">
     <div class="ChartLayout">
-        <v-chart :option="mapOption" autoresize style="width: 100%; height: 100%;"></v-chart>
+        <v-chart :option="mapOption" autoresize style="width: 100%; height: 100%;" v-on:click="transTo"></v-chart>
     </div>
 </template>
 <script lang="ts" setup>
@@ -20,6 +20,8 @@ import {
     VisualMapComponent
 } from 'echarts/components';
 import { MapChart } from 'echarts/charts';
+import { useRouter } from 'vue-router';
+import { Switch } from '@element-plus/icons-vue';
 
 use([
     TitleComponent,
@@ -31,7 +33,7 @@ use([
     VisualMapComponent
 ]);
 
-const GTMap:any= GT;
+const GTMap: any = GT;
 
 echarts.registerMap('GT', GTMap);
 
@@ -45,6 +47,20 @@ const mapOption = ref(
         tooltip: {
             trigger: 'item',
             formatter: '{b} <br/> {c}'
+        },
+        visualMap: {
+            min: 4000,
+            max: 12000,
+            left: 'left',
+            top: 'bottom',
+            text: ['高', '低'],
+            calculable: true,
+            inRange: {
+                color: ['#5DE2E7', '#ffcc00']
+            },
+            textStyle: {
+                color: '#000000'
+            }
         },
         series: [
             {
@@ -95,17 +111,60 @@ const mapOption = ref(
 
     }
 )
+const router = useRouter()
+function transTo(params: any) {
+
+    switch (params.data.name) {
+        default:
+            console.log('default');
+            router.push({ path: '/Index', query: { name: params.data.name } });
+            break;
+        case '克钦邦':
+            console.log('克钦邦');
+            router.push({ path: '/Index', query: { name: '克钦邦' } });
+            break;
+        case '掸邦':
+            console.log('掸邦');
+            break;
+        case '琅南塔':
+            params.data.name = 'Louangnamtha';
+            break;
+        case '琅勃拉邦':
+            params.data.name = 'Louangphabang';
+            break;
+        case '乌多姆赛':
+            params.data.name = 'Oudomxai';
+            break;
+        case '丰沙里':
+            params.data.name = 'Phongsaly';
+            break;
+        case '波乔':
+            params.data.name = 'Bokeo';
+            break;
+        case '清莱':
+            params.data.name = 'Chiang Rai';
+            break;
+        case '清迈':
+            params.data.name = 'Chiang Mai';
+            break;
+    }
+
+    // 这里可以进行一些初始化操作
+    console.log(params);
+    // router.push('/Index');
+
+}
 
 
 
 </script>
 <style lang="css">
-    .ChartLayout {
-        width: 100%;
-        height: 100%;
-        background-color: #ffffff;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        display: flex;
-    }
+.ChartLayout {
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+}
 </style>

@@ -43,7 +43,7 @@ const PieOption = {
             emphasis: {
                 label: {
                     show: true,
-                    fontSize: 40,
+                    fontSize: 32,
                     fontWeight: 'bold'
                 }
             },
@@ -87,50 +87,6 @@ const PieOption = {
                     "value": 160,
                     "name": "杜鹃花属"
                 },
-                {
-                    "value": 145,
-                    "name": "凤仙花属"
-                },
-                {
-                    "value": 134,
-                    "name": "姜黄属"
-                },
-                {
-                    "value": 128,
-                    "name": "沼泽蕨属"
-                },
-                {
-                    "value": 125,
-                    "name": "紫金牛属"
-                },
-                {
-                    "value": 124,
-                    "name": "柯属"
-                },
-                {
-                    "value": 123,
-                    "name": "玉凤花属"
-                },
-                {
-                    "value": 115,
-                    "name": "柿属"
-                },
-                {
-                    "value": 113,
-                    "name": "姜属"
-                },
-                {
-                    "value": 110,
-                    "name": "魔芋属"
-                },
-                {
-                    "value": 108,
-                    "name": "省藤属"
-                },
-                {
-                    "value": 105,
-                    "name": "银背藤属"
-                }
             ]
         }
     ]

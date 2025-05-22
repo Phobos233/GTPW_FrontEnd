@@ -64,14 +64,22 @@
 </template>
 <script lang="ts" setup>
 
+import { onMounted } from 'vue';
 import icon from '../res/img/leaf.png';
 import { useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
+
+const route= useRoute()
 
 const router = useRouter()
 
 function goToChart() {
-  router.push('/chart');
+  router.push('/chartsindex');
 }
+onMounted(() => {
+  console.log(route.query.name);
+  document.title = '金三角植物物种数据可视化平台';
+});
 </script>
 <style scoped>
 #indexLayout {

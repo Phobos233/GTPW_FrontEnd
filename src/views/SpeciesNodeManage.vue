@@ -33,7 +33,7 @@
         <el-input v-model="form.country" autocomplete="off" />
       </el-form-item>
       <el-form-item label="图片" :label-width="formLabelWidth">
-        <el-upload action="http://localhost:8080/findAll">
+        <el-upload action="http://localhost:8080/findAllSpecies">
           <el-button size="small" type="primary">点击上传</el-button>
         </el-upload>
       </el-form-item>
@@ -54,7 +54,7 @@
 import { ref } from 'vue'
 import axios from 'axios';
 import { onMounted } from 'vue';
-import { count } from 'echarts/types/src/component/dataZoom/history.js';
+
 
 const dialogFormVisible = ref(false)
 const formLabelWidth = ref('120px')

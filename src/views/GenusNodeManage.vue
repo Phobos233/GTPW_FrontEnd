@@ -53,8 +53,7 @@
 import { ref } from 'vue'
 import axios from 'axios';
 import { onMounted } from 'vue';
-import { count } from 'echarts/types/src/component/dataZoom/history.js';
-import { id } from 'element-plus/es/locales.mjs';
+
 
 const dialogFormVisible = ref(false)
 const formLabelWidth = ref('120px')

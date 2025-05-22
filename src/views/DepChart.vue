@@ -6,13 +6,15 @@
             <br />
             <el-text>植物分类（科）：{{ rawData[0].family }}</el-text>
             <br />
+            <el-text>植物分类（属）：{{ rawData[0].genus }}</el-text>
+            <br />
             <el-text>植物学名：{{ rawData[0].taxon_name }}</el-text>
             <br />
-            <el-text>所属国家：{{ rawData[0].country }}</el-text>
+            <el-text>所属国家：{{ rawData[0].area }}</el-text>
             <br />
             <el-text>
                 图片： </el-text>
-            <el-image src="src/res/img/sample.png" fit="contain" style="height: 50%;width: 50%;" />
+            <el-image :src="imgURL" fit="contain" style="height: 50%;width: 50%;" />
 
 
         </div>
@@ -34,6 +36,7 @@ import {
 import { GraphChart } from 'echarts/charts';
 import { CanvasRenderer } from 'echarts/renderers';
 import * as echarts from 'echarts/core';
+import imgURL from '@/res/img/sample.png';
 
 use([TitleComponent
     , GraphChart
@@ -51,9 +54,10 @@ let rawData = ref([{
     id: Number,
     taxon_rank: '',
     taxon_name: '',
-    ch_name: '',
+    ch_name: String,
     family: '',
-    country: ''
+    area: '',
+    genus: '',
 }])
 const drawer = ref(false)
 
@@ -75,6 +79,7 @@ const depOption = ref(
                 animationDurationUpdate: 1500,
                 animationEasingUpdate: 'quinticInOut',
                 type: 'graph',
+                large: true,
                 roam: true, // 允许拖拽缩放
                 layout: "force",
                 symbolSize: 50, // 节点大小
@@ -89,7 +94,7 @@ const depOption = ref(
                 label: {
                     show: true, // 显示标签
                     position: 'left', // 标签位置
-                    formatter: '{b}', // 标签格式
+                    formatter: '{c}', // 标签格式
                     fontSize: 12, // 字体大小
                     color: '#000000' // 字体颜色
                 },
@@ -107,17 +112,17 @@ const depOption = ref(
 function SearchAllNodes() {
     axios({
         method: 'post',
-        url: 'http://localhost:8080/GraphChart_All', // Replace with your actual API endpoint
-        // params: {
-        //     search: this.searchQuery // Use the search query from the input field
-        // }
+        url: 'http://localhost:8080/findNodesByArea', // Replace with your actual API endpoint
+        params: {
+            area: 'Laos' // Use the search query from the input field
+        }
 
     })
         .then(response => {
             data.value = response.data;
         })
         .catch(error => {
-            console.log('Error fetching plant data:', error);
+            console.log('Error fetching nodess data:', error);
         });
     return data.value
 }
@@ -125,7 +130,7 @@ function SearchAllNodes() {
 function SearchAllEdges() {
     axios({
         method: 'post',
-        url: 'http://localhost:8080/getEdgesForCharts', // Replace with your actual API endpoint
+        url: 'http://localhost:8080/findAllEdges', // Replace with your actual API endpoint
         // params: {
         //     search: this.searchQuery // Use the search query from the input field
         // }
@@ -136,7 +141,7 @@ function SearchAllEdges() {
             console.log(linkdata.value)
         })
         .catch(error => {
-            console.log('Error fetching plant data:', error);
+            console.log('Error fetching edge data:', error);
         });
     return linkdata.value
 }
@@ -144,7 +149,7 @@ function SearchAllEdges() {
 function SearchRawData(node_id: number) {
     axios({
         method: 'post',
-        url: 'http://localhost:8080/findSpeciesById', // Replace with your actual API endpoint
+        url: 'http://localhost:8080/findSpeciesByNodeId', // Replace with your actual API endpoint
         params: {
             id: node_id // Use the search query from the input field
         }
@@ -155,16 +160,16 @@ function SearchRawData(node_id: number) {
             console.log(rawData.value)
         })
         .catch(error => {
-            console.log('Error fetching plant data:', error);
+            console.log('Error fetching node data:', error);
         });
     return rawData.value
 
 }
 
 function detail(params: any) {
-    console.log(params.data.node_id)
+    console.log(params.data.id)
     drawer.value = true
-    SearchRawData(params.data.node_id)
+    SearchRawData(params.data.id)
     console.log(rawData.value)
 }
 
