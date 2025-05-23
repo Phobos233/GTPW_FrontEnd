@@ -72,6 +72,16 @@ const router = createRouter({
             name: "ChartsIndex",
             component: () => import("../views/ChartIndex.vue"),
         },
+        {
+            path: "/Relationchart",
+            name: "RelationChart",
+            component: () => import("../views/DepChart.vue"),
+        },
+        {
+            path: "/Search",
+            name: "Search",
+            component: () => import("../views/SearchList.vue"),
+        },
     ],
 })
 export default router

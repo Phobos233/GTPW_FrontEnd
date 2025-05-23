@@ -52,41 +52,17 @@ const PieOption = {
             },
             data: [
                 {
-                    "value": 434,
-                    "name": "石斛属"
+                    "value": 10110,
+                    "name": "缅甸"
                 },
                 {
-                    "value": 416,
-                    "name": "石豆兰属"
+                    "value": 11636,
+                    "name": "泰国"
                 },
                 {
-                    "value": 274,
-                    "name": "榕属"
-                },
-                {
-                    "value": 204,
-                    "name": "秋海棠属"
-                },
-                {
-                    "value": 182,
-                    "name": "蒲桃属"
-                },
-                {
-                    "value": 177,
-                    "name": "马蓝属"
-                },
-                {
-                    "value": 165,
-                    "name": "莎草属"
-                },
-                {
-                    "value": 164,
-                    "name": "贝母兰属"
-                },
-                {
-                    "value": 160,
-                    "name": "杜鹃花属"
-                },
+                    "value": 5449,
+                    "name": "老挝"
+                }
             ]
         }
     ]

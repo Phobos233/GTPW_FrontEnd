@@ -1,16 +1,16 @@
 <template>
     <v-chart id="depChart" :option="depOption" autoresize @click="detail" />
-    <el-drawer v-model="drawer" title="植物详细信息" direction="rtl">
+    <el-drawer v-model="species_drawer" title="植物详细信息" direction="rtl">
         <div class="plantInfo">
-            <el-text>植物名称：{{ rawData[0].ch_name }}</el-text>
+            <el-text>植物名称：{{ plantRawData[0].ch_name }}</el-text>
             <br />
-            <el-text>植物分类（科）：{{ rawData[0].family }}</el-text>
+            <el-text>植物分类（科）：{{ plantRawData[0].family }}</el-text>
             <br />
-            <el-text>植物分类（属）：{{ rawData[0].genus }}</el-text>
+            <el-text>植物分类（属）：{{ plantRawData[0].genus }}</el-text>
             <br />
-            <el-text>植物学名：{{ rawData[0].taxon_name }}</el-text>
+            <el-text>植物学名：{{ plantRawData[0].taxon_name }}</el-text>
             <br />
-            <el-text>所属国家：{{ rawData[0].area }}</el-text>
+            <el-text>所属国家：{{ plantRawData[0].area }}</el-text>
             <br />
             <el-text>
                 图片： </el-text>
@@ -19,6 +19,19 @@
 
         </div>
 
+    </el-drawer>
+    <el-drawer v-model="genus_drawer" title="属详细信息" direction="rtl">
+        <div class="genusInfo">
+            <el-text>属名称：{{ genusRawData[0].ch_name }}</el-text>
+            <br />
+            <el-text>植物分类（科）：{{ genusRawData[0].family }}</el-text>
+            <br />
+            <el-text>属学名：{{ genusRawData[0].taxon_name }}</el-text>
+            <br />
+            <el-text>
+                图片： </el-text>
+            <el-image :src="imgURL" fit="contain" style="height: 50%;width: 50%;" />
+        </div>
     </el-drawer>
 </template>
 <script setup lang="ts">
@@ -37,6 +50,8 @@ import { GraphChart } from 'echarts/charts';
 import { CanvasRenderer } from 'echarts/renderers';
 import * as echarts from 'echarts/core';
 import imgURL from '@/res/img/sample.png';
+import { useRoute } from 'vue-router';
+import { el } from 'element-plus/es/locales.mjs';
 
 use([TitleComponent
     , GraphChart
@@ -50,7 +65,7 @@ use([TitleComponent
 
 let data = ref([])
 let linkdata = ref([])
-let rawData = ref([{
+let plantRawData = ref([{
     id: Number,
     taxon_rank: '',
     taxon_name: '',
@@ -59,7 +74,16 @@ let rawData = ref([{
     area: '',
     genus: '',
 }])
-const drawer = ref(false)
+let genusRawData = ref([{
+    id: Number,
+    taxon_rank: '',
+    taxon_name: '',
+    ch_name: String,
+    family: '',
+}])
+const species_drawer = ref(false)
+const genus_drawer = ref(false)
+const route = useRoute()
 
 const depOption = ref(
     {
@@ -112,9 +136,9 @@ const depOption = ref(
 function SearchAllNodes() {
     axios({
         method: 'post',
-        url: 'http://localhost:8080/findNodesByArea', // Replace with your actual API endpoint
+        url: 'http://localhost:8080/findNodesByAreaInNeed', // Replace with your actual API endpoint
         params: {
-            area: 'Laos' // Use the search query from the input field
+            area: route.query.name // Use the search query from the input field
         }
 
     })
@@ -122,7 +146,7 @@ function SearchAllNodes() {
             data.value = response.data;
         })
         .catch(error => {
-            console.log('Error fetching nodess data:', error);
+            console.log('Error fetching nodes data:', error);
         });
     return data.value
 }
@@ -146,7 +170,7 @@ function SearchAllEdges() {
     return linkdata.value
 }
 
-function SearchRawData(node_id: number) {
+function SearchPlantRawData(node_id: number) {
     axios({
         method: 'post',
         url: 'http://localhost:8080/findSpeciesByNodeId', // Replace with your actual API endpoint
@@ -156,21 +180,51 @@ function SearchRawData(node_id: number) {
 
     })
         .then(response => {
-            rawData.value = response.data;
-            console.log(rawData.value)
+            plantRawData.value = response.data;
+            console.log(plantRawData.value)
         })
         .catch(error => {
             console.log('Error fetching node data:', error);
         });
-    return rawData.value
+    return plantRawData.value
+
+}
+function SearchGenusRawData(node_id: number) {
+    axios({
+        method: 'post',
+        url: 'http://localhost:8080/findGenusByNodeId', // Replace with your actual API endpoint
+        params: {
+            id: node_id // Use the search query from the input field
+        }
+
+    })
+        .then(response => {
+            genusRawData.value = response.data;
+            console.log(genusRawData.value)
+        })
+        .catch(error => {
+            console.log('Error fetching node data:', error);
+        });
+    return genusRawData.value
 
 }
 
 function detail(params: any) {
-    console.log(params.data.id)
-    drawer.value = true
-    SearchRawData(params.data.id)
-    console.log(rawData.value)
+    console.log(params.data)
+    if (params.data.type == 'Genus') {
+        genus_drawer.value = true
+        SearchGenusRawData(params.data.id)
+        console.log(genusRawData.value)
+    }
+    else if (params.data.type == 'Species') {
+        species_drawer.value = true
+        SearchPlantRawData(params.data.id)
+        console.log(plantRawData.value)
+    }
+    else {
+        console.log('error')
+    }
+    
 }
 
 onMounted(() => {

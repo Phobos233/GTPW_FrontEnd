@@ -4,9 +4,8 @@
            <el-table :data="data" style="width: 100%">
             <el-table-column prop="id" label="用户ID"></el-table-column>
             <el-table-column prop="username" label="用户名"></el-table-column>
-            <el-table-column prop="region" label="发现地区"></el-table-column>
+            <el-table-column prop="region" label="地区"></el-table-column>
             <el-table-column prop="country" label="所属国家"></el-table-column>
-            <el-table-column prop="imgURL" label="图片">图片</el-table-column>
             <el-table-column label="操作">
                 <el-button type="primary"  @click="">编辑</el-button>
                 <el-button type="danger" >删除</el-button>
@@ -46,6 +45,6 @@ onMounted(() => {
 
 </script>
 
-<style lang="">
+<style lang="css" scoped>
     
 </style>

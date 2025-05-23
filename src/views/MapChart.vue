@@ -85,15 +85,15 @@ const mapOption = ref(
                     }
                 },
                 data: [
-                    { name: '克钦邦', value: 10110 },
-                    { name: '掸邦', value: 10110 },
-                    { name: '琅南塔', value: 5449 },
-                    { name: '琅勃拉邦', value: 5449 },
-                    { name: '乌多姆赛', value: 5449 },
-                    { name: '丰沙里', value: 5449 },
-                    { name: '波乔', value: 5449 },
-                    { name: '清莱', value: 11636 },
-                    { name: '清迈', value: 11636 }
+                    { name: '克钦邦', value: 10104 },
+                    { name: '掸邦', value: 10104 },
+                    { name: '琅南塔', value: 5448 },
+                    { name: '琅勃拉邦', value: 5448 },
+                    { name: '乌多姆赛', value: 5448 },
+                    { name: '丰沙里', value: 5448 },
+                    { name: '波乔', value: 5448 },
+                    { name: '清莱', value: 11634 },
+                    { name: '清迈', value: 11634 }
                 ], // 这里可以添加地图数据
                 nameMap: {
                     "Kachin": '克钦邦'
@@ -112,40 +112,49 @@ const mapOption = ref(
     }
 )
 const router = useRouter()
+
 function transTo(params: any) {
 
     switch (params.data.name) {
         default:
             console.log('default');
-            router.push({ path: '/Index', query: { name: params.data.name } });
+            router.push({ path: '/RelationChart', query: { name: 'Myanmar' } });
             break;
         case '克钦邦':
             console.log('克钦邦');
-            router.push({ path: '/Index', query: { name: '克钦邦' } });
+            router.push({ path: '/RelationChart', query: { name: 'Myanmar' } });
             break;
         case '掸邦':
             console.log('掸邦');
+            router.push({ path: '/RelationChart', query: { name: 'Myanmar' } });
             break;
         case '琅南塔':
-            params.data.name = 'Louangnamtha';
+            console.log('琅南塔');
+            router.push({ path: '/RelationChart', query: { name: 'Laos' } });
             break;
         case '琅勃拉邦':
-            params.data.name = 'Louangphabang';
+            console.log('琅勃拉邦');
+            router.push({ path: '/RelationChart', query: { name: 'Laos' } });
             break;
         case '乌多姆赛':
-            params.data.name = 'Oudomxai';
+            console.log('乌多姆赛');
+            router.push({ path: '/RelationChart', query: { name: 'Laos' } });
             break;
         case '丰沙里':
-            params.data.name = 'Phongsaly';
+            console.log('丰沙里');
+            router.push({ path: '/RelationChart', query: { name: 'Laos' } });
             break;
         case '波乔':
-            params.data.name = 'Bokeo';
+            console.log('波乔');
+            router.push({ path: '/RelationChart', query: { name: 'Laos' } });
             break;
         case '清莱':
-            params.data.name = 'Chiang Rai';
+            console.log('清莱');
+            router.push({ path: '/RelationChart', query: { name: 'Thailand' } });
             break;
         case '清迈':
-            params.data.name = 'Chiang Mai';
+            console.log('清迈');
+            router.push({ path: '/RelationChart', query: { name: 'Thailand' } });
             break;
     }
 

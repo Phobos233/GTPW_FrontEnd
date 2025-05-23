@@ -18,14 +18,13 @@
                 <el-input v-model="inputText" style="max-width: 600px;height: 80%;" placeholder="请输入搜索内容" clearable
                     size="large" class="input-with-select">
                     <template #prepend>
-                        <el-select placeholder="搜索选项" style="width: 115px">
-                            <el-option label="学名" value="1" />
-                            <el-option label="中文名" value="2" />
-                            <el-option label="地区" value="3" />
+                        <el-select placeholder="搜索选项" style="width: 115px" v-model="selectOp">
+                            <el-option v-for="item in selectOps" :key="item.value" :label="item.label"
+                                :value="item.value" />
                         </el-select>
                     </template>
                     <template #append>
-                        <el-button>搜索
+                        <el-button @click="goToSearch">搜索
                             <Search />
                         </el-button>
                     </template>
@@ -61,7 +60,7 @@
                     <AreaChart />
                 </div>
                 <div id="rightlower">
-                    <DepChartConditional />
+                    <PieChart_Area_Species />
                 </div>
             </el-col>
         </el-row>
@@ -71,17 +70,36 @@
     </div>
 </template>
 <script setup lang="ts">
-import { RouterView } from 'vue-router';
+
 import MapChart from './MapChart.vue';
-import DepChart from './DepChart.vue';
 import BarChart_Country_Species from './BarChart_Country_Species.vue';
 import PieChart_Genus_Species from './PieChart_Genus_Species.vue';
+import PieChart_Area_Species from './PieChart_Area_Species.vue';
 import AreaChart from './AreaChart.vue';
-import DepChartConditional from './DepChartConditional.vue';
 import { ref } from 'vue';
 import { Search } from '@element-plus/icons-vue';
+import { useRouter } from 'vue-router';
+import { onMounted } from 'vue';
+
+const router = useRouter();
+const selectOps = [
+    { value: '1', label: '学名' },
+    { value: '2', label: '中文名' },
+    { value: '3', label: '地区' }
+];
 
 let inputText = ref('');
+let selectOp = ref();
+
+
+function goToSearch() {
+    console.log(inputText.value);
+    router.push({ path: '/Search', query: { name: inputText.value, type: selectOp.value } });
+    // Perform search logic here
+}
+onMounted(() => {
+    selectOp.value = '1';
+});
 
 </script>
 <style lang="css" scoped>
