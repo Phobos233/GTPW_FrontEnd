@@ -15,7 +15,6 @@
         <el-button type="danger">删除</el-button>
       </el-table-column>
     </el-table>
-    
 
   </div>
   <el-dialog v-model="dialogFormVisible" :title="dialogTitle" width="500">

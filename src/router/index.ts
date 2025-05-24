@@ -82,6 +82,33 @@ const router = createRouter({
             name: "Search",
             component: () => import("../views/SearchList.vue"),
         },
+        {
+            path: "/UserCenter",
+            name: "UserCenter",
+            component: () => import("../views/UserCenter.vue"),
+            children: [
+                {
+                    path: "UserInfo",
+                    name: "UserInfo",
+                    component: () => import("../views/UserDataManage/UserInfo.vue"),
+                },
+                {
+                    path: "UserCollection",
+                    name: "UserCollection",
+                    component: () => import("../views/UserDataManage/UserStarList.vue"),
+                },
+                {
+                    path: "UserLike",
+                    name: "UserLike",
+                    component: () => import("../views/UserDataManage/UserLikeList.vue"),
+                },
+                {
+                    path: "UserComment",
+                    name: "UserComment",
+                    component: () => import("../views/UserDataManage/UserComment.vue"),
+                }
+            ]
+        }
     ],
 })
 export default router
