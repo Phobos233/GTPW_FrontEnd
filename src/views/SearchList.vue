@@ -55,7 +55,11 @@
                         <el-table-column prop="taxon_rank" label="分类等级"></el-table-column>
 
                         <el-table-column label="操作">
-                            <el-button type="primary" @click="seeDetail">查看</el-button>
+                            <template #default="scope">
+                                <el-button type="primary" @click="seeDetail(scope.row.taxon_rank,scope.row.taxon_name,scope.row.id)">查看</el-button>
+                            </template>
+
+
                         </el-table-column>
                     </el-table>
 
@@ -76,13 +80,50 @@
         </el-row>
 
     </div>
-    <el-dialog v-model="dialogFormVisible">
+    <el-dialog v-model="dialogFormVisible" id="SpeciesDetail">
         <el-row>
             <el-col :span="12" align="center">
-                1
+                <div id="infoContainer">
+                    <el-text>学名：{{ SpeciesdetailData[0].taxon_name }}</el-text>
+                    <br />
+                    <el-text>中文名：{{ SpeciesdetailData[0].ch_name }}</el-text>
+                    <br />
+                    <el-text>所属地区：{{ SpeciesdetailData[0].area }}</el-text>
+                    <br />
+                    <el-text>所属属：{{ SpeciesdetailData[0].genus }}</el-text>
+                    <br />
+
+                </div>
             </el-col>
             <el-col :span="12" align="center">
-                2
+                <div id="imgContainer">
+                    <el-image :src="imgURL" fit="contain" style="height: 50%;width: 50%;" />
+
+                </div>
+            </el-col>
+        </el-row>
+    </el-dialog>
+
+    <el-dialog v-model="dialogFormVisibleGenus" id="GenusDetail">
+        <el-row>
+            <el-col :span="12" align="center">
+                <div id="infoContainer">
+                    <el-text>学名：{{ detailGenusData[0].taxon_name }}</el-text>
+                    <br />
+                    <el-text>中文名：{{ detailGenusData[0].ch_name }}</el-text>
+                    <br />
+                    <el-text>所属科：{{ detailGenusData[0].family }}</el-text>
+                    <br />
+
+                </div>
+            </el-col>
+            <el-col :span="12" align="center">
+                <div id="minichartContainer">
+                    <!-- <v-chart :options="depOption" style="width: 100%; height: 100%;"></v-chart>
+                      -->
+                    <el-image :src="imgURL" fit="contain" style="height: 50%;width: 50%;" />
+
+                </div>
             </el-col>
         </el-row>
     </el-dialog>
@@ -95,6 +136,79 @@ import { useRoute, useRouter } from 'vue-router';
 import { ref, onMounted } from 'vue';
 import { Search } from '@element-plus/icons-vue'
 import axios from 'axios';
+import { id } from 'element-plus/es/locales.mjs';
+import imgURL from '@/res/img/sample.png';
+
+import {
+    TitleComponent
+    , TooltipComponent
+    , LegendComponent,
+    VisualMapComponent
+} from 'echarts/components';
+import { GraphChart } from 'echarts/charts';
+import { CanvasRenderer } from 'echarts/renderers';
+import * as echarts from 'echarts/core';
+import { use } from 'echarts/core';
+import VChart, { THEME_KEY } from 'vue-echarts';
+use([TitleComponent
+    , GraphChart
+    , CanvasRenderer
+    , TooltipComponent
+    , LegendComponent
+    , VisualMapComponent
+]);
+
+let nodedata = ref([])
+let linkdata = ref([])
+
+const depOption = ref(
+    {
+        title: {
+            text: '植物分类点状图',
+            left: 'center',
+            top: '20px',
+        },
+        tooltip: {
+            trigger: 'item', // 触发类型
+            formatter: '{b} <br/> {c}', // 标签格式
+        },
+
+        series: [
+            {
+                name: '植物分类点状图',
+                animationDurationUpdate: 1500,
+                animationEasingUpdate: 'quinticInOut',
+                type: 'graph',
+                large: true,
+                roam: true, // 允许拖拽缩放
+                layout: "force",
+                symbolSize: 50, // 节点大小
+                symbol: 'circle', // 节点形状
+                force: {
+                    repulsion: 1500, // 节点间斥力
+                    gravity: 0.5,    // 向心力
+                    edgeLength: 200 // 边的理想长度
+                },
+                data: nodedata, // 节点数据
+                links: linkdata,
+                label: {
+                    show: true, // 显示标签
+                    position: 'left', // 标签位置
+                    formatter: '{c}', // 标签格式
+                    fontSize: 12, // 字体大小
+                    color: '#000000' // 字体颜色
+                },
+                emphasis: {
+                    focus: 'adjacency',
+                    lineStyle: {
+                        width: 10
+                    }
+                }
+            }
+        ]
+    }
+)
+
 
 //路由
 const route = useRoute();
@@ -110,6 +224,7 @@ const background = ref(true);
 let inputText = ref('');
 let total = ref(100);
 let dialogFormVisible = ref(false);
+let dialogFormVisibleGenus = ref(false);
 let selectOps = [
     { value: '1', label: '学名' },
     { value: '2', label: '中文名' },
@@ -117,6 +232,25 @@ let selectOps = [
 ];
 let selectOp = ref();
 let listData = ref([]);
+let SpeciesdetailData = ref([{
+    taxon_name: String,
+    family: String,
+    genus: String,
+    genus_c: String,
+    species: String,
+    ch_name: String,
+    area: String,
+    taxon_rank: String,
+    imgURL: String
+}]);
+
+let detailGenusData = ref([{
+    node_id: Number,
+    taxon_name: String,
+    family: String,
+    genus: String,
+    ch_name: String,
+}]);
 
 //分页触发函数
 const handleSizeChange = (val: number) => {
@@ -128,10 +262,62 @@ const handleCurrentChange = (val: number) => {
     console.log(`当前页码: ${val}`);
 }
 
+function seeDetail(taxon_rank: string,taxon_name: string,id: number) {
+    console.log('查看详情');
+    console.log(id);
+    if(taxon_rank === 'Genus') {
+        SearchNodesInneed(taxon_name);
+        SearchLinkInneed(id);
+        seeGenusDetail(id);
+        console.log('属');
+        console.log('查看详情');
+    } else if(taxon_rank === 'Species') {
+        seeSpeciesDetail(id);
+        console.log('种');
+        console.log('查看详情');
+    }
+}
+
 //搜索详细信息
-function seeDetail() {
+function seeSpeciesDetail(id: number) {
+    axios({
+        method: 'post',
+        url: 'http://localhost:8080/findSpeciesByNodeId', // Replace with your actual API endpoint
+        params: {
+            id: id, // Use the search query from the input field
+        }
+    })
+        .then(response => {
+            SpeciesdetailData.value = response.data;
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.log('Error fetching nodes data:', error);
+        });
+    console.log(id);
     console.log('查看详情');
     dialogFormVisible.value = true;
+}
+
+function seeGenusDetail(id: number) {
+    console.log(id);
+    console.log('查看属详情');
+    axios({
+        method: 'post',
+        url: 'http://localhost:8080/findGenusByNodeId', // Replace with your actual API endpoint
+        params: {
+            id: id, // Use the search query from the input field
+        }
+    })
+        .then(response => {
+            detailGenusData.value = response.data;
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.log('Error fetching nodes data:', error);
+        });
+
+    dialogFormVisibleGenus.value = true;
 }
 
 //搜索&条件搜索
@@ -276,6 +462,7 @@ function SearchFunc() {
 
             case '3': {
                 console.log('地区');
+                
                 break;
             }
 
@@ -287,6 +474,44 @@ function SearchFunc() {
 
 
 }
+
+function SearchNodesInneed(genus: string) {
+    axios({
+        method: 'post',
+        url: 'http://localhost:8080/findCNodesByGenus', // Replace with your actual API endpoint
+        params: {
+            genus: genus, // Use the search query from the input field
+        }
+    })
+        .then(response => {
+            nodedata.value = response.data;
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.log('Error fetching nodes data:', error);
+        });
+    return listData.value
+}
+
+function SearchLinkInneed(node_id: number) {
+    axios({
+        method: 'post',
+        url: 'http://localhost:8080/findCEdgesByGenus', // Replace with your actual API endpoint
+        params: {
+            genus_id: node_id, // Use the search query from the input field
+        }
+    })
+        .then(response => {
+            linkdata.value = response.data;
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.log('Error fetching nodes data:', error);
+        });
+    return linkdata.value
+}
+
+
 
 //加载函数
 onMounted(() => {
@@ -331,7 +556,19 @@ onMounted(() => {
     border-radius: 10px;
     margin-top: 2%;
 }
+#GenusDetail{
+    width: 500px;
+    height: 500px;
+    border-radius: 10px;
+    margin-top: 2%;
 
+}
+#minichartContainer {
+    width: 50%;
+    height: 100%;
+    border-radius: 10px;
+    margin-top: 2%;
+}
 
 .pagination-block {
     width: 100%;
@@ -341,4 +578,5 @@ onMounted(() => {
     justify-content: center;
     align-items: center;
 }
+
 </style>

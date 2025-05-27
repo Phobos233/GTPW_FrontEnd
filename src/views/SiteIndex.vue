@@ -12,8 +12,8 @@
           <el-col id="menuContainer" :span="4" justify="end">
             <el-menu mode="horizontal" default-active="/index" router>
               <el-menu-item index="/index">主页</el-menu-item>
-              <el-menu-item index="/index/map">数据下载</el-menu-item>
-              <el-menu-item index="/login">登录</el-menu-item>
+              <el-menu-item index="/UserCenter">个人中心</el-menu-item>
+              <el-menu-item index="/login">后台登录</el-menu-item>
             </el-menu>
 
           </el-col>

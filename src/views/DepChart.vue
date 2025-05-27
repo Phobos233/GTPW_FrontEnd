@@ -1,7 +1,9 @@
 <template>
     <v-chart id="depChart" :option="depOption" autoresize @click="detail" />
+
     <el-drawer v-model="species_drawer" title="植物详细信息" direction="rtl">
         <div class="plantInfo">
+
             <el-text>植物名称：{{ plantRawData[0].ch_name }}</el-text>
             <br />
             <el-text>植物分类（科）：{{ plantRawData[0].family }}</el-text>
@@ -12,14 +14,47 @@
             <br />
             <el-text>所属国家：{{ plantRawData[0].area }}</el-text>
             <br />
-            <el-text>
-                图片： </el-text>
-            <el-image :src="imgURL" fit="contain" style="height: 50%;width: 50%;" />
 
+        </div>
+        <div class="plantImg" align="center">
+
+            <el-image :src="imgURL" fit="contain" style="height: 75%;width: 75%;" />
 
         </div>
 
+        <div class="userDo" align="center">
+            <el-button type="primary" @click="createLikeSp">点赞</el-button>
+            <el-button type="primary" @click="createCollectionSp">收藏</el-button>
+        </div>
+        <div id="commentForm" align="center">
+            <el-input v-model="textarea" style="width: 80%" :rows="5" type="textarea" placeholder="Please input" />
+        </div>
+        <div class="buttons" align="End">
+            <el-button type="primary" @click="createCommentSp" id="commitC_btn">提交评论</el-button>
+        </div>
+        <div id="commentListSpecies" align="center">
+            <div id="commentListSample" v-for="comment in commentList" :key="comment.commentId">
+                <div align="start" id="authorDiv">
+                    {{ comment.author }} 评论于 {{ comment.datetime }}
+
+                </div>
+                <div id="CContentDiv" align="start">
+                    {{ comment.content }}
+                </div>
+            </div>
+
+            <div class="pagination-block">
+
+                <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize"
+                    :page-sizes="[10, 20, 30, 40, 50]" :size="size" :background="background"
+                    layout="total,sizes, prev, pager, next" :total="total" @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange" />
+
+            </div>
+        </div>
+
     </el-drawer>
+
     <el-drawer v-model="genus_drawer" title="属详细信息" direction="rtl">
         <div class="genusInfo">
             <el-text>属名称：{{ genusRawData[0].ch_name }}</el-text>
@@ -28,9 +63,43 @@
             <br />
             <el-text>属学名：{{ genusRawData[0].taxon_name }}</el-text>
             <br />
-            <el-text>
-                图片： </el-text>
-            <el-image :src="imgURL" fit="contain" style="height: 50%;width: 50%;" />
+        </div>
+        <div class="genusImg" align="center">
+
+            <el-image :src="imgURL" fit="contain" style="height: 75%;width: 75%;" />
+
+        </div>
+        <div class="userDo" align="center">
+            <el-button :type="btnType" @click="createLikeGe">点赞</el-button>
+            <el-button type="primary" @click="createCollectionGe">收藏</el-button>
+        </div>
+        <div id="commentForm" align="center">
+            <el-input v-model="textarea" style="width: 80%" :rows="5" type="textarea" placeholder="Please input" />
+
+        </div>
+        <div class="buttons" align="End">
+            <el-button type="primary" @click="createCommentGe" id="commitC_btn">提交评论</el-button>
+        </div>
+
+        <div id="commentList" align="center">
+            <div id="commentListSample" v-for="comment in commentList" :key="comment.commentId">
+                <div align="start" id="authorDiv">
+                    {{ comment.author }} 评论于 {{ comment.datetime }}
+
+                </div>
+                <div id="CContentDiv" align="start">
+                    {{ comment.content }}
+                </div>
+            </div>
+
+            <div class="pagination-block">
+
+                <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize"
+                    :page-sizes="[10, 20, 30, 40, 50]" :size="size" :background="background"
+                    layout="total,sizes, prev, pager, next" :total="total" @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange" />
+
+            </div>
         </div>
     </el-drawer>
 </template>
@@ -53,6 +122,8 @@ import imgURL from '@/res/img/sample.png';
 import { useRoute } from 'vue-router';
 import { el } from 'element-plus/es/locales.mjs';
 
+let imgsrc = ref('https://d2seqvvyy3b8p2.cloudfront.net/622052744475889b8937d26ae387aecb.jpg')
+
 use([TitleComponent
     , GraphChart
     , CanvasRenderer
@@ -62,11 +133,22 @@ use([TitleComponent
 ]);
 
 // provide(THEME_KEY, 'dark');
-
+let btnType = ref('primary')
+let textarea = ref('')
 let data = ref([])
 let linkdata = ref([])
+let commentList = ref([{
+    commentId: Number,
+    author: String,
+    authorId: Number,
+    commentTo: String,
+    commentToId: Number,
+    content: String,
+    datetime: String,
+}])
+
 let plantRawData = ref([{
-    id: Number,
+    node_id: Number,
     taxon_rank: '',
     taxon_name: '',
     ch_name: String,
@@ -75,12 +157,15 @@ let plantRawData = ref([{
     genus: '',
 }])
 let genusRawData = ref([{
-    id: Number,
+    node_id: Number,
     taxon_rank: '',
     taxon_name: '',
     ch_name: String,
     family: '',
 }])
+
+
+
 const species_drawer = ref(false)
 const genus_drawer = ref(false)
 const route = useRoute()
@@ -132,6 +217,23 @@ const depOption = ref(
         ]
     }
 )
+
+const currentPage = ref(1);
+const size = ref('default');
+const pageSize = ref(10);
+const background = ref(true);
+let total = ref(100);
+let likeData = ref([])
+
+//分页触发函数
+const handleSizeChange = (val: number) => {
+    // SearchFunc();
+    console.log(`${val} 条数据每页`)
+}
+const handleCurrentChange = (val: number) => {
+    // SearchFunc();
+    console.log(`当前页码: ${val}`);
+}
 
 function SearchAllNodes() {
     axios({
@@ -209,22 +311,279 @@ function SearchGenusRawData(node_id: number) {
 
 }
 
+
 function detail(params: any) {
     console.log(params.data)
     if (params.data.type == 'Genus') {
         genus_drawer.value = true
         SearchGenusRawData(params.data.id)
+        getCommentCount(params)
+        getCommentList(params)
         console.log(genusRawData.value)
     }
     else if (params.data.type == 'Species') {
         species_drawer.value = true
+        getCommentCount(params)
+        getCommentList(params)
         SearchPlantRawData(params.data.id)
         console.log(plantRawData.value)
     }
     else {
         console.log('error')
     }
-    
+
+}
+
+function getCommentCount(params: any) {
+    axios({
+        method: 'post',
+        url: 'http://localhost:8080/comment/count/commentToId', // Replace with your actual API endpoint
+        params: {
+            commentToId: params.data.id,
+            // Use the search query from the input field
+        }
+
+    })
+        .then(response => {
+            total.value = response.data;
+        })
+        .catch(error => {
+            console.log('Error fetching nodes data:', error);
+        });
+    return total.value
+}
+
+function getCommentList(params: any) {
+    axios({
+        method: 'post',
+        url: 'http://localhost:8080/comment/find/commentToId', // Replace with your actual API endpoint
+        params: {
+            commentToId: params.data.id,
+            // Use the search query from the input field
+        }
+
+    })
+        .then(response => {
+            commentList.value = response.data;
+            console.log(commentList.value)
+        })
+        .catch(error => {
+            console.log('Error fetching nodes data:', error);
+        });
+    return commentList.value
+}
+
+function createCommentGe(params: any) {
+    console.log('提交评论')
+    console.log(textarea.value)
+    axios({
+        method: 'post',
+        url: 'http://localhost:8080/comment/create', // Replace with your actual API endpoint
+        params: {
+            authorId: 19939, // Replace with the actual author ID
+            commentToId: genusRawData.value[0].node_id,
+            content: textarea.value,
+            // Use the search query from the input field
+        }
+
+    })
+        .then(response => {
+             getCommentList(genusRawData.value[0].node_id)
+            console.log(commentList.value)
+        })
+        .catch(error => {
+            console.log('Error fetching nodes data:', error);
+        });
+}
+
+function createCommentSp(params: any) {
+    console.log('提交评论')
+    console.log(textarea.value)
+    axios({
+        method: 'post',
+        url: 'http://localhost:8080/comment/create', // Replace with your actual API endpoint
+        params: {
+            authorId: 19939, // Replace with the actual author ID
+            commentToId: plantRawData.value[0].node_id,
+            content: textarea.value,
+            // Use the search query from the input field
+        }
+
+    })
+        .then(response => {
+            getCommentList(genusRawData.value[0].node_id)
+            console.log(commentList.value)
+        })
+        .catch(error => {
+            console.log('Error fetching nodes data:', error);
+        });
+}
+
+function getLike(params: any) {
+    console.log('获取点赞')
+    axios({
+        method: 'post',
+        url: 'http://localhost:8080/like/find/authorIdAndLikeToId', // Replace with your actual API endpoint
+        params: {
+            likeToId: params.data.id,
+            authorId: 19939, // Replace with the actual author ID
+            // Use the search query from the input field
+        }
+
+    })
+        .then(response => {
+            likeData.value = response.data;
+        })
+        .catch(error => {
+            console.log('Error fetching nodes data:', error);
+        });
+
+}
+
+function createLikeSp(authorid: number,likeToId: number) {
+
+    console.log('点赞')
+    console.log(genusRawData.value[0].node_id)
+    axios({
+        method: 'post',
+        url: 'http://localhost:8080/like/create', // Replace with your actual API endpoint
+        params: {
+            likeToId: plantRawData.value[0].node_id,
+            authorId: 19939, // Replace with the actual author ID
+            // Use the search query from the input field
+        }
+
+    })
+        .then(response => {
+            console.log(response.data)
+            likeData.value = response.data;
+        })
+        .catch(error => {
+            console.log('Error fetching like data:', error);
+        });
+}
+function createLikeGe(authorid: number,likeToId: number) {
+    console.log('点赞')
+    console.log(genusRawData.value[0].node_id)
+    axios({
+        method: 'post',
+        url: 'http://localhost:8080/like/create', // Replace with your actual API endpoint
+        params: {
+            likeToId: genusRawData.value[0].node_id,
+            authorId: 19939, // Replace with the actual author ID
+            // Use the search query from the input field
+        }
+
+    })
+        .then(response => {
+
+            likeData.value = response.data;
+        })
+        .catch(error => {
+            console.log('Error fetching like data:', error);
+        });
+}
+
+function deleteLikeGe() {
+    console.log('取消点赞')
+    axios({
+        method: 'post',
+        url: 'http://localhost:8080/like/delete', // Replace with your actual API endpoint
+        params: {
+            likeToId: genusRawData.value[0].node_id,
+            authorId: 19939, // Replace with the actual author ID
+            // Use the search query from the input field
+        }
+
+    })
+        .then(response => {
+            likeData.value = response.data;
+        })
+        .catch(error => {
+            console.log('Error fetching nodes data:', error);
+        });
+}
+function deleteLikeSp(params: any) {
+    console.log('取消点赞')
+    axios({
+        method: 'post',
+        url: 'http://localhost:8080/like/delete', // Replace with your actual API endpoint
+        params: {
+            likeToId: plantRawData.value[0].node_id,
+            authorId: 19939, // Replace with the actual author ID
+            // Use the search query from the input field
+        }
+
+    })
+        .then(response => {
+            likeData.value = response.data;
+        })
+        .catch(error => {
+            console.log('Error fetching nodes data:', error);
+        });
+}
+
+function getCollection(params: any) {
+    console.log('获取收藏')
+    axios({
+        method: 'post',
+        url: 'http://localhost:8080/collect/find/authorIdAndCollectionToId', // Replace with your actual API endpoint
+        params: {
+            collectionToId: params.data.id,
+            authorId: 19939, // Replace with the actual author ID
+            // Use the search query from the input field
+        }
+
+    })
+        .then(response => {
+            console.log(response.data)
+        })
+        .catch(error => {
+            console.log('Error fetching nodes data:', error);
+        });
+
+}
+
+function createCollectionSp(){
+    console.log('收藏')
+    axios({
+        method: 'post',
+        url: 'http://localhost:8080/collect/create', // Replace with your actual API endpoint
+        params: {
+            collectionToId: plantRawData.value[0].node_id,
+            authorId: 19939, // Replace with the actual author ID
+            // Use the search query from the input field
+        }
+
+    })
+        .then(response => {
+            console.log(response.data)
+        })
+        .catch(error => {
+            console.log('Error fetching like data:', error);
+        });
+
+}
+
+function createCollectionGe(){
+    console.log('收藏')
+    axios({
+        method: 'post',
+        url: 'http://localhost:8080/collect/create', // Replace with your actual API endpoint
+        params: {
+            collectionToId: genusRawData.value[0].node_id,
+            authorId: 19939, // Replace with the actual author ID
+            // Use the search query from the input field
+        }
+
+    })
+        .then(response => {
+            console.log(response.data)
+        })
+        .catch(error => {
+            console.log('Error fetching like data:', error);
+        });
+
 }
 
 onMounted(() => {
@@ -236,5 +595,43 @@ onMounted(() => {
 <style lang="css" scoped>
 #depChart {
     height: 100vh;
+}
+.plantInfo {
+    margin-bottom: 20px;
+}
+
+.userDo {
+    margin: 20px;
+}
+.SpeciesImg {
+    margin: 20px;
+}
+.genusImg {
+    margin: 20px;
+}
+
+#commentListSample {
+    width: 85%;
+    height: 10vh;
+    margin: 20px;
+    padding: 10px;
+    background-color: #6d696956;
+    border: 1px solid #716d6df9;
+    border-radius: 15px;
+    box-sizing: border-box;
+    box-shadow: 10px 10px 10px #000000ac;
+}
+
+#authorDiv {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* .genusInfo {
+    margin: 20px;
+} */
+#commentForm {
+    margin: 16px;
 }
 </style>

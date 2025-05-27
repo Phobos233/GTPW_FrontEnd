@@ -26,9 +26,6 @@
                         <el-menu-item index="/">
                             主页
                         </el-menu-item>
-                        <el-menu-item index="UserInfo">
-                            用户信息
-                        </el-menu-item>
                         <el-menu-item index="/UserCenter/UserLike">
                             用户历史点赞
                         </el-menu-item>
