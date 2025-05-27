@@ -1,0 +1,103 @@
+<template lang="html">
+    <div id="PieChartLayout">
+        <VChart :option="PieOption" autoresize style="width: 100%; height: 100%;"></VChart>
+    </div>
+</template>
+<script setup lang="ts">
+import VChart, { THEME_KEY } from 'vue-echarts';
+
+import { onMounted, ref } from 'vue';
+import axios from 'axios';
+import { use } from 'echarts/core'
+import { PieChart } from 'echarts/charts'
+import { TooltipComponent, LegendComponent } from 'echarts/components'
+import { CanvasRenderer } from 'echarts/renderers'
+use([TooltipComponent, LegendComponent, PieChart, CanvasRenderer])
+
+let dataset = ref([])
+
+
+const PieOption = {
+    tooltip: {
+        trigger: 'item'
+    },
+    legend: {
+        top: '5%',
+        left: 'center'
+    },
+    series: [
+        {
+            name: '金三角植物物种数量分布-饼图（按属划分）',
+            type: 'pie',
+            radius: ['40%', '70%'],
+            avoidLabelOverlap: false,
+            itemStyle: {
+                borderRadius: 10,
+                borderColor: '#fff',
+                borderWidth: 2
+            },
+            label: {
+                show: false,
+                position: 'center'
+            },
+            emphasis: {
+                label: {
+                    show: true,
+                    fontSize: 32,
+                    fontWeight: 'bold'
+                }
+            },
+            labelLine: {
+                show: false
+            },
+            data: [
+                {
+                    "value": 10110,
+                    "name": "缅甸"
+                },
+                {
+                    "value": 11636,
+                    "name": "泰国"
+                },
+                {
+                    "value": 5449,
+                    "name": "老挝"
+                }
+            ]
+        }
+    ]
+};
+
+function SearchPieData() {
+    axios({
+        method: 'post',
+        url: 'http://localhost:8080/PieChart_Count_Genus_Belong', // Replace with your actual API endpoint
+        // params: {
+        //     search: this.searchQuery // Use the search query from the input field
+        // }
+
+    })
+        .then(response => {
+            dataset.value = response.data;
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.log('Error fetching piecount data:', error);
+        });
+    return dataset;
+}
+onMounted(() => {
+    // SearchPieData()
+})
+
+</script>
+<style lang="css" scoped>
+#PieChartLayout {
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+}
+</style>

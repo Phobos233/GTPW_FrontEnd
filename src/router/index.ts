@@ -1,5 +1,6 @@
 import { createRouter } from "vue-router";
 import { createWebHistory } from "vue-router";
+import MapChart from "../views/MapChart.vue";
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
@@ -14,9 +15,14 @@ const router = createRouter({
                     component: () => import("../views/Home.vue"),
                 },
                 {
-                    path: "plantNode",
-                    name: "PlantModeManage",
-                    component: () => import("../views/PlantNodeManage.vue"),
+                    path: "SpeciesNode",
+                    name: "SpeciesNodeManage",
+                    component: () => import("../views/SpeciesNodeManage.vue"),
+                },
+                {
+                    path: "GenusNode",
+                    name: "GenusNodeManage",
+                    component: () => import("../views/GenusNodeManage.vue"),
                 },
                 {
                     path:"plantRelation",
@@ -41,18 +47,67 @@ const router = createRouter({
             component: () => import("../views/Login.vue"),  
         },
         {
+            path: "/chart",
+            name: "Chart",
+            component: () => import("../views/ChartView.vue"),
+            children: [
+                {
+                    path: "RelationChart",
+                    name: "RelationMap",
+                    component: () => import("../views/DepChart.vue"),
+                },
+                {
+                    path: "MapChart",
+                    name: "RegionMap",
+                    component: () => import("../views/MapChart.vue"),
+                },
+            ]
+        },
+        {
             path: "/",
             redirect: "/index",
         },
         {
-            path: "/chart",
-            name: "Chart",
+            path: "/chartsindex",
+            name: "ChartsIndex",
+            component: () => import("../views/ChartIndex.vue"),
+        },
+        {
+            path: "/Relationchart",
+            name: "RelationChart",
             component: () => import("../views/DepChart.vue"),
         },
         {
-            path: "/test",
-            name: "Test",
-            component: () => import("../views/testchart.vue"),
+            path: "/Search",
+            name: "Search",
+            component: () => import("../views/SearchList.vue"),
+        },
+        {
+            path: "/UserCenter",
+            name: "UserCenter",
+            component: () => import("../views/UserCenter.vue"),
+            children: [
+                {
+                    path: "UserInfo",
+                    name: "UserInfo",
+                    component: () => import("../views/UserDataManage/UserInfo.vue"),
+                },
+                {
+                    path: "UserCollection",
+                    name: "UserCollection",
+                    component: () => import("../views/UserDataManage/UserStarList.vue"),
+                },
+                {
+                    path: "UserLike",
+                    name: "UserLike",
+                    component: () => import("../views/UserDataManage/UserLikeList.vue"),
+                },
+                {
+                    path: "UserComment",
+                    name: "UserComment",
+                    component: () => import("../views/UserDataManage/UserComment.vue"),
+                }
+            ]
         }
     ],
 })
